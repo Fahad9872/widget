@@ -1,5 +1,19 @@
-.widget-container {
-  @apply fixed bottom-5 right-5 w-[300px] h-[400px] bg-white border border-gray-200 rounded-lg shadow-lg z-[9999];
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.widget-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #2563eb; /* blue-600 */
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 9999px; /* full rounded */
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s;
 }
 
 .widget-button {

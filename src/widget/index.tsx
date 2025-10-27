@@ -1,5 +1,7 @@
+// index.tsx
 import { hydrateRoot } from 'react-dom/client';
 import { WidgetContainer } from './components/widget-container';
+import styleContent from './styles/style.css'; // Vite: load CSS as string
 
 function initializeWidget() {
   if (document.readyState !== 'loading') {
@@ -11,34 +13,39 @@ function initializeWidget() {
 
 function onReady() {
   try {
-    const wrapper = document.createElement('div');
-    const shadow = wrapper.attachShadow({ mode: 'open' });
+    const element = document.createElement('div');
+    const shadow = element.attachShadow({ mode: 'open' });
     const shadowRoot = document.createElement('div');
-    shadowRoot.id = 'widget-root';
-    shadow.appendChild(shadowRoot);
-
     const clientKey = getClientKey();
 
-    // Inject compiled CSS
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = import.meta.env.WIDGET_CSS_URL || '/style.css';
-    shadowRoot.appendChild(link);
+    shadowRoot.id = 'widget-root';
 
-    // Mount React widget
     const component = <WidgetContainer clientKey={clientKey} />;
+
+    shadow.appendChild(shadowRoot);
+    injectStyle(shadowRoot);
     hydrateRoot(shadowRoot, component);
 
-    document.body.appendChild(wrapper);
+    document.body.appendChild(element);
   } catch (error) {
     console.warn('Widget initialization failed:', error);
   }
 }
 
+function injectStyle(shadowRoot: HTMLElement) {
+  const styleTag = document.createElement('style');
+  styleTag.textContent = styleContent;
+  shadowRoot.appendChild(styleTag);
+}
+
 function getClientKey() {
   const script = document.currentScript as HTMLScriptElement;
   const clientKey = script?.getAttribute('data-client-key');
-  if (!clientKey) throw new Error('Missing data-client-key attribute');
+
+  if (!clientKey) {
+    throw new Error('Missing data-client-key attribute');
+  }
+
   return clientKey;
 }
 
