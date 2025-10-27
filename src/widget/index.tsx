@@ -1,7 +1,7 @@
 // index.tsx
 import { hydrateRoot } from 'react-dom/client';
 import { WidgetContainer } from './components/widget-container';
-import styleContent from './styles/style.css'; // Vite: load CSS as string
+import './styles/style.css';
 
 function initializeWidget() {
   if (document.readyState !== 'loading') {
@@ -23,29 +23,25 @@ function onReady() {
     const component = <WidgetContainer clientKey={clientKey} />;
 
     shadow.appendChild(shadowRoot);
-    injectStyle(shadowRoot);
-    hydrateRoot(shadowRoot, component);
 
+    // Clone all existing styles from document (processed by Vite/Tailwind) into shadow DOM
+    const styleTags = Array.from(
+      document.querySelectorAll('style, link[rel="stylesheet"]'),
+    );
+    styleTags.forEach((tag) => shadow.appendChild(tag.cloneNode(true)));
+
+    hydrateRoot(shadowRoot, component);
     document.body.appendChild(element);
   } catch (error) {
     console.warn('Widget initialization failed:', error);
   }
 }
 
-function injectStyle(shadowRoot: HTMLElement) {
-  const styleTag = document.createElement('style');
-  styleTag.textContent = styleContent;
-  shadowRoot.appendChild(styleTag);
-}
-
 function getClientKey() {
   const script = document.currentScript as HTMLScriptElement;
   const clientKey = script?.getAttribute('data-client-key');
 
-  if (!clientKey) {
-    throw new Error('Missing data-client-key attribute');
-  }
-
+  if (!clientKey) throw new Error('Missing data-client-key attribute');
   return clientKey;
 }
 
